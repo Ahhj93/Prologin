@@ -1,0 +1,57 @@
+----
+Sample 1
+##
+4
+5
+Rostheim
+Adaheim
+Pascalheim
+Fortrheim
+AMRAC
+##
+Adaheim
+Fortrheim
+Pascalheim
+Rostheim
+----
+Sample 2
+##
+6
+6
+Nixheim
+Haskelheim
+Cobolheim
+Prologheim
+Delpheim
+Modulheim
+MMAACC
+##
+Nixheim
+Haskelheim
+Delpheim
+Modulheim
+Cobolheim
+Prologheim
+----
+Sample 3
+##
+2
+2
+Lispheim
+Erlangheim
+RM
+##
+Lispheim
+----
+Beaucoup de tours
+##
+3
+24
+Benoheim
+Hatheim
+D-Heim
+ARAAAAAMMAAAARCAACAMRAMC
+##
+D-Heim
+Hatheim
+----

@@ -24,6 +24,7 @@ for action in actions:
         # Recracher la dernière ville qu'il a mangé et qu'il n'a pas encore recraché,
         # pour la placer devant sa tête
         villes.insert(0, ventre.pop(len(ventre)-1))
+    print(villes)
 
 # On affiche les villes
 for ville in villes:
