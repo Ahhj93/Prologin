@@ -16,9 +16,9 @@ def affiche(liste: list, indice: int, avant: bool):
     liste: list = villes[indice:] + villes[:indice]
     if not avant:
         liste = liste[::-1]
-    for ville in liste:
-        print(ville)
+    return liste
 
+#print(affiche(villes, indice, avant))
 for action in actions:
     if action == "A":
         # Avancer d'une ville de manière circulaire dans la liste
@@ -34,7 +34,7 @@ for action in actions:
             indice = indice % N
         else:
             ventre.append(villes.pop(indice-1))
-            indice = (indice - 1) % N
+            indice = (indice-1) % N
     elif action == "R":
         # Se retourner, ce qui signifie qu'il avancera alors dans
         # la direction opposée par la suite. S'il avançait de gauche à droite,
@@ -49,6 +49,9 @@ for action in actions:
         else:
             villes.insert(indice, ventre.pop(len(ventre)-1))
             indice = (indice + 1) % N
+    #print(affiche(villes, indice, avant), action)
 
 # On affiche les villes à partir de l'indice
-affiche(villes, indice, avant)
+liste = affiche(villes, indice, avant)
+for ville in liste:
+    print(ville)
