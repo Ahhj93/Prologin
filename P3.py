@@ -1,8 +1,6 @@
 N: int = int(input()) # Nombre de villes
 M: int = int(input()) # Nombre d'années avant le Ragnarök
-villes: list = [] # Liste des villes
-for i in range(N):
-    villes.append(input())
+villes: list = [input() for _ in range(N)]  # Liste des villes
 actions: list = [elt for elt in input()] # Liste des actions
 
 ventre: list = [] # Liste des villes mangées
