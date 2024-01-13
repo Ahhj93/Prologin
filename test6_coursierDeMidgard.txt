@@ -1,0 +1,35 @@
+----
+Sample 1
+##
+3
+Alof Amno
+Baikik Brok
+Alof Brok
+##
+Alof Amno
+Alof Brok
+Baikik Brok
+----
+Sample 2
+##
+5
+0dric Apik
+0dric Brik
+1dric Apik
+1dric Brik
+Tonb Apik
+##
+Tonb Apik
+1dric Apik
+1dric Brik
+0dric Brik
+0dric Apik
+----
+Sample 3
+##
+3
+Seche Plusplus
+Seche Seche
+Seche Harpe
+##
+IMPOSSIBLE
