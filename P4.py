@@ -8,12 +8,10 @@ def max_villes(n: int, k: int, villes: List[int], indice: int):
     :param indice: indice de la ville de départ
     :return: maximum des villes parcourues
     """
-    tmp: list = []
     if indice+k <= len(villes):
-        tmp = villes[indice:indice+k]
+        return max(villes[indice:indice+k])
     else:
-        tmp = villes[indice:] + villes[:indice+k-len(villes)]
-    return max(tmp)
+        return max(villes[indice:] + villes[:indice+k-len(villes)])
 
 def batiments(n: int, r: int, k: int, villes: List[int]) -> None:
     """
@@ -24,10 +22,9 @@ def batiments(n: int, r: int, k: int, villes: List[int]) -> None:
     """
     # Afficher le nombre de bâtiments cassés à chaque ville après les $R$
     # mouvements sous la forme d'une suite d'entiers séparés par des espaces.
-    tmp: list = villes[:]
     for i in range(r):
-        tmp[i%n] = max_villes(n, k, tmp, i%n)
-    print(*tmp)
+        villes[i%n] = max_villes(n, k, villes, i%n)
+    print(*villes)
 
 if __name__ == "__main__":
     n = int(input())
