@@ -1,70 +1,85 @@
 from typing import List
 
+class Noeud:
+    def __init__(self, valeur):
+        self.valeur = valeur
+        self.precedent = None
+        self.suivant = None
+
+class Liste_doublement_chainee:
+    def __init__(self):
+        self.tete = None
+        self.sens = True
+
+    def creer_depuis_liste(self, elements):
+        if not elements:
+            return
+
+        self.tete = Noeud(elements[0])
+        current = self.tete
+
+        for valeur in elements[1:]:
+            nouveau_noeud = Noeud(valeur)
+            current.suivant = nouveau_noeud
+            nouveau_noeud.precedent = current
+            current = nouveau_noeud
+
+        # Fermer la boucle en reliant le dernier nœud au premier
+        current.suivant = self.tete
+        self.tete.precedent = current
+
+    def avancer_ville(self):
+        if self.sens:
+            self.tete = self.tete.suivant
+        else:
+            self.tete = self.tete.precedent
+
+    def manger_ville(self):
+        # Supprimer le nœud actuel et mettre à jour les liens
+        suivant = self.tete.suivant
+        precedent = self.tete.precedent
+
+        suivant.precedent = precedent
+        precedent.suivant = suivant
+
+        # Mettre à jour la tête
+        self.tete = suivant
+
+    def retourner(self):
+        self.sens = not self.sens
+
+    def recracher_ville(self):
+        # Insérer un nouveau nœud devant la tête
+        nouvelle_ville = Noeud(self.tete.precedent.valeur)
+        nouvelle_ville.suivant = self.tete
+        nouvelle_ville.precedent = self.tete.precedent
+
+        self.tete.precedent.suivant = nouvelle_ville
+        self.tete.precedent = nouvelle_ville
+
+    def afficher_liste(self):
+        current = self.tete
+        while True:
+            print(current.valeur)
+            current = current.suivant
+            if current == self.tete:
+                break
+
 def situation_finale(n: int, m: int, villes: List[str], actions: List[str]) -> None:
-    """
-    :param n: le nombre de villes autour de Midgard
-    :param m: le nombre d'années avant le Ragnarök
-    :param villes: le nom des villes autour de Midgard, en partant de la queue de Jörmungandr
-
-    :param actions: la liste des actions prochaines de Jörmungandr
-    """
-    # TODO Afficher, sur une ligne par ville, la liste des villes qui seront
-    # rencontrées lors du Ragnarök, dans l'ordre, en partant de la queue de
-    # Jörmungandr jusqu'à sa tête.
-    ventre: list = [] # Liste des villes mangées
-    indice_ventre: int = 0 # Indice de la ville mangée actuelle
-
-    indice: int = 0 # Indice de la ville actuelle
-
-    tmp: list = villes[:]
-    sens: bool = True # True: de gauche à droite, False: de droite à gauche
-
-    nb_villes: int = n
+    liste_villes = Liste_doublement_chainee()
+    liste_villes.creer_depuis_liste(villes)
 
     for action in actions:
-        if action == "A":
-            # Avancer d'une ville de manière circulaire dans la liste
-            if sens:
-                indice += 1
-            else:
-                indice -= 1
-            indice %= nb_villes
-        elif action == "M":
-            # Manger la ville la plus proche devant sa tête
-            if sens:
-                ventre.append(tmp.pop(indice))
-            else:
-                ventre.append(tmp.pop(indice-1))
-                if indice != 0:
-                    indice -= 1
-            nb_villes -= 1
-            indice %= nb_villes
-        elif action == "R":
-            # Se retourner, ce qui signifie qu'il avancera alors dans
-            # la direction opposée par la suite. S'il avançait de gauche à droite,
-            # il avance alors de droite à gauche, et inversement
-            sens = not sens
-        elif action == "C":
-            # Recracher la dernière ville qu'il a mangé et qu'il n'a pas encore recraché,
-            # pour la placer devant sa tête
-            if sens:
-                tmp.insert(indice, ventre.pop(len(ventre)-1))
-            else:
-                tmp.insert(indice, ventre.pop(len(ventre)-1))
-                indice += 1
-            nb_villes += 1
-            indice %= nb_villes
-        #print(action, indice, end=" ")
-        #affiche_villes(sens, indice, tmp)
-    affiche_villes(sens, indice, tmp)
+        if action == 'A':
+            liste_villes.avancer_ville()
+        elif action == 'M':
+            liste_villes.manger_ville()
+        elif action == 'R':
+            liste_villes.retourner()
+        elif action == 'C':
+            liste_villes.recracher_ville()
 
-def affiche_villes(sens, indice, villes):
-    if sens:
-        #print(*villes[indice:] + villes[:indice])
-        print(*villes[indice:] + villes[:indice], sep="\n")
-    else:
-        #print(*(villes[indice:] + villes[:indice])[::-1])
-        print(*(villes[indice:] + villes[:indice])[::-1], sep="\n")
+    liste_villes.afficher_liste()
 
 if __name__ == "__main__":
     n = int(input())
