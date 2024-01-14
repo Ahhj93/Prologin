@@ -1,54 +1,68 @@
 from typing import List
-
+import sys
+sys.setrecursionlimit(10000000)
 
 def chemin_valide(n: int, dieux: List[str], m: int, passations: List[str]) -> None:
     """
-    Vérifie si les transmissions du message respectent le protocole HTTP.
     :param n: le nombre de dieux
     :param dieux: liste des prénoms et noms des dieux séparés par un espace
     :param m: nombre de passations du message
     :param passations: liste des échanges de message entre les dieux, les noms complets des deux dieux séparés par un espace
     """
-    transmissions = set(passations)  # Convertit la liste des transmissions en ensemble pour une recherche plus rapide
-    possible_dieux_initiaux = []
+    def est_bonne_racine(racine, voisins_arbre):
+        # Initialisation des ensembles et dictionnaires pour le suivi des dieux visités
+        premiers_mauvais: set = set()
+        derniers_mauvais: set = set()
+        visites: dict = {dieu: False for dieu in voisins_arbre}
 
-    # Parcourt tous les dieux pour les considérer comme dieu initial
-    for dieu_initial in dieux:
-        chemin = [dieu_initial]  # Initialise le chemin avec le dieu initial
-        dernier_dieu = dieu_initial
+        def rec_aux(dieu, ancetre):
+            # Fonction récursive pour explorer les voisins de chaque dieu dans l'arbre
+            prenom, nom = dieu
+            if prenom in premiers_mauvais or nom in derniers_mauvais or visites[dieu]:
+                return False
+            else:
+                visites[dieu] = True
+                for voisin in voisins_arbre[dieu] - {ancetre}:
+                    if not rec_aux(voisin, dieu):
+                        return False
+                premiers_mauvais.add(prenom)
+                derniers_mauvais.add(nom)
+                return True
+            
+        # Appel de la fonction récursive pour vérifier si la racine est bonne
+        if rec_aux(racine, ("PasPossible", "IlsOntCela")):
+            if all(visites[dieu] for dieu in voisins_arbre):
+                return True
+        return False
+    
+    # Vérification du nombre de dieux et passations
+    if n != (m + 1):
+        print("NON")
+        return
 
-        # Effectue les transmissions suivant les règles du protocole HTTP
-        for _ in range(n - 1):
-            transmission_possible = False
+    # Création d'un dictionnaire pour enregistrer les voisins dans l'arbre pour chaque dieu
+    voisins_dans_arbre: dict = {tuple(dieu.split()): set() for dieu in dieux}
 
-            # Parcourt tous les dieux pour trouver le prochain destinataire possible
-            for dieu in dieux:
-                transmission = f"{dernier_dieu} {dieu}"
+    # Analyse des passations pour construire l'arbre des voisins
+    for dieux_echange in passations:
+        dieux_propres = dieux_echange.split()
+        dieu1 = tuple(dieux_propres[:2])
+        dieu2 = tuple(dieux_propres[2:])
+        if dieu1[1] != dieu2[1] and dieu1[0] != dieu2[0]:
+            print("NON")
+            return
+        voisins_dans_arbre[dieu1].add(dieu2)
+        voisins_dans_arbre[dieu2].add(dieu1)
 
-                if transmission in transmissions and dieu not in chemin and all(
-                    f"{dieu2} {dieu}" not in transmissions for dieu2 in chemin
-                ):
-                    chemin.append(dieu)
-                    dernier_dieu = dieu
-                    transmission_possible = True
-                    break
+    # Recherche des bonnes racines dans l'arbre
+    bonnes_racines: list = [racine for racine in voisins_dans_arbre if est_bonne_racine(racine, voisins_dans_arbre)]
 
-            # Si aucune transmission possible, abandonne le chemin
-            if not transmission_possible:
-                break
-
-        # Vérifie si le chemin a atteint tous les dieux
-        if len(set(chemin)) == n:
-            possible_dieux_initiaux.append(dieu_initial)
-
-    # Affiche le résultat
-    if possible_dieux_initiaux:
+    # Affichage du résultat
+    if bonnes_racines:
         print("OUI")
-        for dieu_initial in possible_dieux_initiaux:
-            print(dieu_initial)
+        print("\n".join(" ".join(dieu) for dieu in bonnes_racines))
     else:
         print("NON")
-
 
 if __name__ == "__main__":
     n = int(input())
