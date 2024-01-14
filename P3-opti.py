@@ -1,101 +1,102 @@
-from typing import List
+class Node:
+    def __init__(self, data):
+        self.data = data
+        self.next = None
+        self.prev = None
 
-class Noeud:
-    def __init__(self, valeur):
-        self.valeur = valeur
-        self.precedent = None
-        self.suivant = None
+    def addAfter(self, nextdata):
+        stock = self.next
+        nextNode = Node(nextdata)
+        self.next = nextNode
+        nextNode.prev = self
+        stock.prev = nextNode
+        nextNode.next = stock
 
-class Liste_doublement_chainee:
-    def __init__(self):
-        self.tete = None
-        self.sens = True
-        self.mangees = []
+    def deleteAfter(self):
+        stock = self.next
+        self.next = self.next.next
+        self.next.prev = self
+        return stock
 
-    def creer_depuis_liste(self, elements):
-        if not elements:
-            return
+    def addBefore(self, prevdata):
+        stock = self.prev
+        prevNode = Node(prevdata)
+        self.prev = prevNode
+        prevNode.next = self
+        stock.next = prevNode
+        prevNode.prev = stock
 
-        self.tete = Noeud(elements[0])
-        current = self.tete
-
-        for valeur in elements[1:]:
-            nouveau_noeud = Noeud(valeur)
-            current.suivant = nouveau_noeud
-            nouveau_noeud.precedent = current
-            current = nouveau_noeud
-
-        # Fermer la boucle en reliant le dernier nœud au premier
-        current.suivant = self.tete
-        self.tete.precedent = current
-
-    def avancer_ville(self):
-        if self.sens:
-            self.tete = self.tete.suivant
+    def deleteBefore(self):
+        stock = self.prev
+        self.prev = self.prev.prev
+        self.prev.next = self
+        return stock
+    
+    def affiche(self, sens):
+        print_text = ""
+        tmp_node = self
+        if sens == 1:
+            while tmp_node.next != self:
+                print_text += tmp_node.data + "\n"
+                tmp_node = tmp_node.next
+            print_text += tmp_node.data
         else:
-            self.tete = self.tete.precedent
+            while tmp_node.prev != self:
+                print_text += tmp_node.data + "\n"
+                tmp_node = tmp_node.prev
+            print_text += tmp_node.data
+        print(print_text)
 
-    def manger_ville(self):
-        # Ajouter la ville mangée à la liste
-        self.mangees.append(self.tete.valeur)
 
-        # Supprimer le nœud actuel et mettre à jour les liens
-        suivant = self.tete.suivant
-        precedent = self.tete.precedent
-
-        suivant.precedent = precedent
-        precedent.suivant = suivant
-
-        # Mettre à jour la tête
-        self.tete = suivant
-
-    def retourner(self):
-        self.sens = not self.sens
-        if self.sens:
-            self.tete = self.tete.suivant
-        else:
-            self.tete = self.tete.precedent
-
-    def recracher_ville(self):
-        if self.mangees:
-            # Insérer la dernière ville mangée devant la tête
-            nouvelle_ville = Noeud(self.mangees.pop())
-            nouvelle_ville.suivant = self.tete
-            nouvelle_ville.precedent = self.tete.precedent
-
-            self.tete.precedent.suivant = nouvelle_ville
-            self.tete.precedent = nouvelle_ville
-
-    def afficher_liste(self):
-        current = self.tete
-        while True:
-            print(current.valeur, end=' ')
-            if self.sens:
-                current = current.suivant
-            else:
-                current = current.precedent
-
-            if current == self.tete:
-                print()
-                break
-
-def situation_finale(n: int, m: int, villes: List[str], actions: List[str]) -> List[str]:
-    liste_villes = Liste_doublement_chainee()
-    liste_villes.creer_depuis_liste(villes)
+def simulate_jormungandr(initial, actions):
+    current_node = initial
+    sens = 1
+    eat = []
 
     for action in actions:
         if action == 'A':
-            liste_villes.avancer_ville()
+            if sens == 1:
+                current_node = current_node.next
+            else:
+                current_node = current_node.prev
         elif action == 'M':
-            liste_villes.manger_ville()
+            if sens == 1:
+                eat.append(current_node.prev.deleteAfter().data)
+                current_node = current_node.next
+            else:
+                eat.append(current_node.next.deleteBefore().data)
+                current_node = current_node.prev
         elif action == 'R':
-            liste_villes.retourner()
+            sens *= -1
+            if sens == 1:
+                current_node = current_node.next
+            else:
+                current_node = current_node.prev
         elif action == 'C':
-            liste_villes.recracher_ville()
-        #print(action, end=' ')
-        #liste_villes.afficher_liste()
+            if sens == 1:
+                current_node.addBefore(eat.pop())
+                current_node = current_node.prev
+            else:
+                current_node.addAfter(eat.pop())
+                current_node = current_node.next
+        #current_node.affiche(sens)
 
-    liste_villes.afficher_liste()
+    current_node.affiche(sens)
+
+
+def situation_finale(n, m, villes, actions):
+    start_node = Node(villes[0])
+    start_node.next = start_node
+    start_node.prev = start_node
+    current_node = start_node
+
+    for i in range(1, n):
+        current_node.addAfter(villes[i])
+        current_node = current_node.next
+        #start_node.affiche(1)
+
+    simulate_jormungandr(start_node, actions)
+
 
 if __name__ == "__main__":
     n = int(input())
